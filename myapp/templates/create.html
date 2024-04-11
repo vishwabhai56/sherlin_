@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Create Poll{% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-2">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Create A New Poll</h3>
+            </div>
+            <!-- method="POST" -->
+            <form id="form-data" onsubmit="addOption(event)">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label for="question">Result publish DateTime:</label>
+                                <input name="datetime" id="datetime" type="datetime-local" class="form-control" >
+                            
+                            </div>
+                            <div class="form-group">
+                                <label for="question">Enter Poll Question</label>
+                                <textarea name="question" id="question" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row " id="optionContainer">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label for="option1">Option 1</label>
+                                <input type="text" name="option" id="option1" class="form-control" placeholder="Enter option 1" class="option" required>
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                    <input type="submit" value="Add" class="btn btn-primary text-light" />
+                    <!-- type="submit" -->
+                    <div class="row">
+                        <hr />
+                        <div class="col-lg-4">
+                            <button  class="btn btn-info" onclick="submitform()">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<script>
+    let  option=2;
+    function addOption(event){
+        event.preventDefault();
+        console.log('Hello');
+        const container=document.getElementById("optionContainer");
+        const newContainer = document.createElement('div');
+        newContainer.innerHTML=`
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label for="option${option}">Option ${option}</label>
+                <input type="text" name="option" class="form-control" placeholder="Enter option ${option}" class="option" required />
+            </div>
+        </div>
+        `;
+        option+=1;
+        const form = document.getElementById("form-data");
+        container.appendChild(newContainer);
+    }
+
+    function submitform(){
+        const form = document.getElementById("form-data");
+        const options=form.querySelectorAll('input[name="option"]');
+        const dateTime=form.datetime.value;
+        console.log(dateTime);
+        let optionarr=[];
+        options.forEach(option=>{
+            optionarr.push(option.value);
+        });
+        const dataToSend = {};
+      dataToSend['question']=form.question.value;
+      dataToSend['options']=optionarr;
+      dataToSend['datetime']=dateTime;
+        fetch('/createpoll/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataToSend)
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('Network response was not ok.');
+    })
+    .then(data => {
+        console.log(data);
+        // userId=data['user_id'];
+        // var url = `ticket/?user_id=${userId}&book_id=${bookId}&seat_no=${seatNo}&route_id=${routeId}`;
+        // window.location.href = url;
+    })
+    .catch(error => {
+      // location.reload();
+        console.error('Error:', error);
+        // Handle error
+    });
+
+    }
+</script>
+{% endblock %}

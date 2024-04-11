@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Vote{% endblock %}
+
+{% block main %}
+<style>
+    .popup{
+        position: fixed;
+        top: 75%;
+        left: 50%;
+        z-index: 2;
+        background-color: gray;
+        font-weight: bold;
+    }
+    .hidepopup{
+        visibility: hidden;
+    }
+</style>
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-2">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Cast Your Vote</h3>
+            </div>
+
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h2>{{question.question}}</h2>
+                    </div>
+                </div>
+
+                <div class="row" >
+                    <div class="col-lg-12">
+                        <hr />
+                       
+                        <form onsubmit="vote(event)" id="form-data">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <div class="radio">
+                                    {% for option in options %}
+                                    <label>
+                                        <input type="radio" name="poll" value={{option.option_id}} required>
+                                        {{option.option}}
+                                    </label> &nbsp;
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <button type="submit" class="btn btn-info">
+                                Submit
+                            </button>
+                        </form>
+                        <div id="questionid" style="visibility: hidden;">{{questionid}}</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- hidepopup -->
+<div class="popup text-light btn hidepopup" id="votemsg">
+    Already vote
+</div>
+<script>
+    function vote(event){
+        event.preventDefault();
+        let form=document.getElementById('form-data');
+       let option=form.poll.value;
+       let user_id=localStorage.getItem('myData');
+       console.log(user_id);
+       if(user_id==null){
+        var url = 'http://localhost:8000/login';
+        window.location.href = url;
+       }
+       let question_id=document.getElementById('questionid').innerHTML;
+       console.log('user',user_id);
+       const dataToSend = {
+        user_id:user_id,
+        option:option,
+        question:question_id
+       };
+       fetch('/savevote/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataToSend)
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('Network response was not ok.');
+    })
+    .then(data => {
+        const popup=document.getElementById("votemsg");
+        console.log(data);
+        let status=data['status'];
+        if(status==0){
+            popup.innerHTML='Already vote';
+        }
+        else if(status==2){
+            popup.innerHTML='Voting Finished';
+        }
+        else{
+            popup.innerHTML='vote successfully';
+        }
+        popup.classList.remove('hidepopup');
+        setTimeout(() => {
+            popup.classList.add('hidepopup');
+        }, 3000); 
+    })
+    .catch(error => {
+      // location.reload();
+        console.error('Error:', error);
+        // Handle error
+    });
+    }
+</script>
+{% endblock %}

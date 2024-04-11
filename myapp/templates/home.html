@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Voting{% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="col-lg-8 col-lg-offset-2">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Available Polls</h3>
+            </div>
+            <ul class="list-group">
+                {% for q in questions %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                     <strong>{{q.question}}</strong> 
+                  </div>
+                  <div>
+                      <a href="{% url 'vote' q.question_id %}" class="btn btn-info text-light" style="font-weight: bold;">Vote</a>
+                      <a href="{% url 'result' q.question_id %}" class="btn btn-info text-light" style="font-weight: bold;">Result</a>
+                  </div>
+                </li>
+                {% endfor %}
+              </ul>
+            <!-- <ul class="list-group">
+                <li class="list-group-item">
+                    <strong>Which language is easier to learn?</strong>
+                    <span class="pull-right">
+                        <a href="#" class="btn btn-info btn-xs" >Vote</a> &nbsp;
+                        <a href="#" class="btn btn-default btn-xs">View Results</a> &nbsp;
+                    </span>
+                </li>
+                <li class="list-group-item">
+                    <strong>Which operating system do you use?</strong>
+                    <span class="pull-right">
+                        <a href="#" class="btn btn-info btn-xs">Vote</a> &nbsp;
+                        <a href="#" class="btn btn-default btn-xs">View Results</a> &nbsp;
+                    </span>
+                </li>
+            </ul> -->
+
+        </div>
+    </div>
+</div>
+<!-- 
+{% for option in q.options %}
+<p>{{option.option}}</p>
+
+{% endfor %} -->
+
+{% endblock %}
